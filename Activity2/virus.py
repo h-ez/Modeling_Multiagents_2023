@@ -14,14 +14,36 @@ class Person(ap.Agent):
         """ Initialize a new variable at agent creation. """
         self.condition = 0  # Susceptible = 0, Infected = 1, Recovered = 2
 
+    def see(self):
+        #The person/agent "see" its current health
+        return self.condition
+    
+    def next(self, health):
+        #The person health changes
+        self.condition = health
+        return health
+    
+    def actionA(self, agent, rng):
+        #Action, proceso de desición si se infecta al vecino
+        if agent.see() == 0 and self.p.infection_chance > rng.random():
+            return True
+        return False
+    
+    def actionB(self, rng):
+        #Action, si se recupera el host
+        if self.p.recovery_chance > rng.random():
+            return True
+        return False
+    
+
     def being_sick(self):
         """ Spread disease to peers in the network. """
         rng = self.model.random
         for n in self.network.neighbors(self):
-            if n.condition == 0 and self.p.infection_chance > rng.random():
-                n.condition = 1  # Infect susceptible peer
-        if self.p.recovery_chance > rng.random():
-            self.condition = 2  # Recover from infection
+            if n.actionA(n, rng):
+                n.next(1) # Infect susceptible peer
+        if self.actionB(rng):
+            self.next(2)  # Recover from infection
 
 
 class VirusModel(ap.Model):
