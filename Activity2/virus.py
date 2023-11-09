@@ -2,6 +2,7 @@
 import agentpy as ap
 import networkx as nx
 import random
+import numpy as np
 
 # Visualization
 import matplotlib.pyplot as plt
@@ -13,6 +14,11 @@ class Person(ap.Agent):
     def setup(self):
         """ Initialize a new variable at agent creation. """
         self.condition = 0  # Susceptible = 0, Infected = 1, Recovered = 2
+        self.time_infected = 1
+        #Estados internos describen a cuantos han infectado, su estado de salud al paso del tiempo
+        self.internal_states = {'Infected':0, 'health_history':[self.condition]}
+        
+       
 
     def see(self):
         #The person/agent "see" its current health
@@ -42,8 +48,13 @@ class Person(ap.Agent):
         for n in self.network.neighbors(self):
             if n.actionA(n, rng):
                 n.next(1) # Infect susceptible peer
+                self.internal_states['Infected'] = 1 + self.internal_states['Infected']
+            n.internal_states['health_history'].append(self.see())
         if self.actionB(rng):
             self.next(2)  # Recover from infection
+            self.internal_states['health_history'].append(self.see())
+
+        self.internal_states['health_history'].append(self.see())
 
 
 class VirusModel(ap.Model):
@@ -92,6 +103,29 @@ class VirusModel(ap.Model):
         self.report('Total share infected', self.I + self.R)
         self.report('Peak share infected', max(self.log['I']))
 
+    def utility(self):
+
+        utility = [agent.internal_states['Infected'] for agent in self.agents]
+
+        return utility
+    
+    def plot_utility(self, num_agents_per_plot):
+        agent_utility = self.utility()
+
+        total_agents = len(self.agents)
+
+        groups_plot = total_agents // num_agents_per_plot
+
+        for i in range(groups_plot):
+            agents_slice = agent_utility[i * num_agents_per_plot : (i + 1) * num_agents_per_plot]
+            indices = np.arange(i * num_agents_per_plot, (i + 1) * num_agents_per_plot)
+            plt.figure(figsize=(12, 6))
+            plt.bar(indices, agents_slice)
+            plt.xlabel('Agents')
+            plt.ylabel('Total Infected')
+            plt.title(f'Infected - Group {i+1}')
+            plt.show()
+
 parameters = {
     'population': 1000,
     'infection_chance': 0.3,
@@ -121,25 +155,12 @@ def virus_stackplot(data, ax):
     ax.set_xlabel("Time steps")
     ax.set_ylabel("Percentage of population")
 
+
+"""
 fig, ax = plt.subplots()
 virus_stackplot(results.variables.VirusModel, ax)
 
 plt.show()
+"""
 
-def animation_plot(m, axs):
-    ax1, ax2 = axs
-    ax1.set_title("Virus spread")
-    ax2.set_title(f"Share infected: {m.I}")
-
-    # Plot stackplot on first axis
-    virus_stackplot(m.output.variables.VirusModel, ax1)
-
-    # Plot network on second axis
-    color_dict = {0:'b', 1:'r', 2:'g'}
-    colors = [color_dict[c] for c in m.agents.condition]
-    nx.draw_circular(m.network.graph, node_color=colors,
-                     node_size=50, ax=ax2)
-
-fig, axs = plt.subplots(1, 2, figsize=(8, 4)) # Prepare figure
-parameters['population'] = 50 # Lower population for better visibility
-animation = ap.animate(VirusModel(parameters), fig, axs, animation_plot)
+model.plot_utility(100)
