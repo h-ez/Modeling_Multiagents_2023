@@ -4,8 +4,9 @@ import numpy as np
 import random
 from owlready2 import *
 from twilio.rest import Client
+from dotenv import load_dotenv
 import os
-
+load_dotenv()
 
 def camionDetectado(): #Cambiar esta funcion a la de Roboflow para detectar camiones
   numero_aleatorio_1 = random.random()
