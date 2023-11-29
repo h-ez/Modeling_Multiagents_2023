@@ -1,3 +1,6 @@
+#use python version 3.11.x
+#pip install roboflow supervision
+#pip install numpy
 import numpy as np
 import supervision as sv
 from roboflow import Roboflow
