@@ -4,7 +4,6 @@ import os
 from roboflow import Roboflow
 
 load_dotenv()
-#rf = Roboflow(api_key="P9KUrFkOZXUp594HiMdX")
 rf = Roboflow(api_key = os.getenv('ROBOFLOW_API_KEY'))
 project = rf.workspace().project("tc2008")
 model = project.version(1).model
