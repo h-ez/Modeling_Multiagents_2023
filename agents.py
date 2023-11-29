@@ -2,13 +2,17 @@
 #pip install agentpy
 #pip install owlready2
 #pip install twilio
+#pip install roboflow
 import agentpy as ap #Para los agentes y simulación 
 #import numpy as np #Para ver los datos
 import random #Para datos dummies
 from owlready2 import * #Para ontologias
 from twilio.rest import Client #Para enviar mensajes de whatsApp
 from dotenv import load_dotenv #Para variables de entorno
+from roboflow import Roboflow #Para la API de Roboflow
 import os
+
+load_dotenv()
 
 
 def camionDetectado(self): 
