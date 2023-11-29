@@ -74,7 +74,6 @@ def callback(frame: np.ndarray, index:int) -> np.ndarray:
     annotated_frame = zone_annotator.annotate(scene=annotated_frame)
     return annotated_frame
 
-
 # process the whole video
 sv.process_video(
     source_path = SOURCE_VIDEO_PATH,
