@@ -50,6 +50,9 @@ def callback(frame: np.ndarray, index:int) -> np.ndarray:
     # model prediction on single frame
     results = model.predict(frame).json()
 
+    # Filter out detections with confidence lower than 0.80
+    results['predictions'] = [d for d in results['predictions'] if d['confidence'] >= 0.80]
+
     # Convert to supervision Detections
     detections = sv.Detections.from_roboflow(results)
 
@@ -69,6 +72,7 @@ def callback(frame: np.ndarray, index:int) -> np.ndarray:
 
     annotated_frame = zone_annotator.annotate(scene=annotated_frame)
     return annotated_frame
+
 
 # process the whole video
 sv.process_video(
