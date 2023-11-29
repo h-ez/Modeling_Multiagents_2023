@@ -9,7 +9,7 @@ import os
 import tempfile
 load_dotenv()
 
-SOURCE_VIDEO_PATH = "videoTest.mkv"
+SOURCE_VIDEO_PATH = "videoTest.mp4"
 TARGET_VIDEO_PATH = "video_out.mp4"
 
 # use https://roboflow.github.io/polygonzone/ to get the points for your line
@@ -26,7 +26,7 @@ project = rf.workspace().project("tc2008")
 model = project.version(1).model
 
 # create BYTETracker instance
-byte_tracker = sv.ByteTrack(track_thresh=0.25, track_buffer=30, match_thresh=0.8, frame_rate=30)
+byte_tracker = sv.ByteTrack(track_thresh=0.80, track_buffer=30, match_thresh=0.8, frame_rate=30)
 
 # create VideoInfo instance
 video_info = sv.VideoInfo.from_video_path(SOURCE_VIDEO_PATH)
@@ -38,7 +38,7 @@ generator = sv.get_video_frames_generator(SOURCE_VIDEO_PATH)
 zone = sv.PolygonZone(polygon=polygon, frame_resolution_wh=(video_info.width, video_info.height))
 
 # create box annotator
-box_annotator = sv.BoxAnnotator(thickness=4, text_thickness=4, text_scale=2)
+box_annotator = sv.BoxAnnotator(thickness=4, text_thickness=4, text_scale=1)
 
 colors = sv.ColorPalette.default()
 
@@ -61,7 +61,7 @@ def callback(frame: np.ndarray, index:int) -> np.ndarray:
 
     # Extract class names and other details from detections
     labels = [
-        f"#{tracker_id} {detection['class']} {confidence:0.2f}"
+        f"#{tracker_id} {detection['class']} {confidence:0.8f}"
         for detection, (_, _, confidence, _, tracker_id) in zip(results['predictions'], tracked_detections)
     ]
 
