@@ -9,7 +9,8 @@ import os
 import tempfile
 load_dotenv()
 
-SOURCE_VIDEO_PATH = "videoTest.mp4"
+#SOURCE_VIDEO_PATH = "videoTest.mp4"
+SOURCE_VIDEO_PATH = "videoTestLong.mp4"
 TARGET_VIDEO_PATH = "video_out.mp4"
 
 # use https://roboflow.github.io/polygonzone/ to get the points for your line
