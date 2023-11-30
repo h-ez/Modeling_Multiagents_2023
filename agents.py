@@ -34,27 +34,22 @@ class camara(ap.Agent): #Agente camara
 
   def setup(self):
     #Beliefs del agente
-
     self.detectCamion = False # Desires, contar los camiones detactados
     self.countTrucks = 0 # Intentions, cuantos camiones ha detectado
     self.totalTrucks = self.model.p.totalTrucks #El numero de camiones que han pagado
     self.intentions = True #Intentions si quiere detectar camiones
     self.conteoTotal = 0 #Conteo total de camiones de todos los agentes/camaras
 
-
-
   def see(self): #Ver en el mapa (Imagen/Video) si hay un camión a la vista
     if camionDetectado(self): #Enviar imagen a la funcion de camionDetected para que lo envie a roboflow
       self.communicate("Camion detectado por camara ", self.id) #Hablar con el resto de las camaras y avisarles de su avistamiento
       self.brf() #Cambiar las beliefs del agente
-     
 
   def brf(self): #si detecta un camion su belief de ver camion cambia a true y ve sus opciones
     
     self.detectCamion = True
     
     self.options()
-
 
   def options(self): #si detecta camion y tiene la intencion de detectar va a dar la opcion de true y seguir al filtro
     if self.detectCamion == True and self.intentions == True:
@@ -74,8 +69,6 @@ class camara(ap.Agent): #Agente camara
     self.countTrucks = self.countTrucks + 1
     self.votacion()
     self.conteoTotal = 0
-    
-
     #enviarWhats(f"Se detecto robo por la camara {self.id}")
   
   def communicate(self, message, ids): #Comunicación entre agentes, el agente que detecte camión le avisa al resto de los agentes
@@ -119,7 +112,6 @@ class camara(ap.Agent): #Agente camara
       else:
         print("Se ha votado por no reportar el robo")
   
-
   def votar(self): #Se vota para reportar el robo
     if self.intentions:
       print("El agente ",self.id," vota +")
@@ -128,18 +120,14 @@ class camara(ap.Agent): #Agente camara
        print("El agente ",self.id," vota -")
        return 0
 
-
 class simulacion(ap.Model):
 
     def setup(self):#Set up de los agentes dentro de la simulacion
-
         # Create agents list
         self.agents = ap.AgentList(self, self.p.numCamaras, camara)
 
-
     def step(self):#En cada paso los agentes miran si detectan un camión
         self.agents.see()
-
 
     def update(self): #Por cada update se ve el numero de camiones detectados por camara
         camionesContados = 0
@@ -149,8 +137,7 @@ class simulacion(ap.Model):
            total = total + camionesContados
            print("Total de camiones detectado por camara ",agentes.id," -> ",camionesContados )
         
-        self.record('Camionestotales', total)
-              
+        self.record('Camionestotales', total)             
           
     def end(self):#AL final de la evaluación se ve el numero de camiones contados por camara
       mensaje = "Reporte del día : "
@@ -158,7 +145,7 @@ class simulacion(ap.Model):
       for agente in self.agents:
         mensaje = mensaje + " La camara "+str(agente.id)+" detecto "+str(agente.countTrucks)+" camiones. "
         print("La camara ",agente.id," detecto ",agente.countTrucks)
-      
+ 
       enviarWhats(mensaje)
 
 def simi(numCam, pasos, total):#Prep para la simulación
@@ -179,8 +166,6 @@ def simi(numCam, pasos, total):#Prep para la simulación
     resutadoFinal = resultados['Camionestotales']
     enviarWhats(f"Se robaron {resutadoFinal-total} camiones")
 
-
-
 def enviarWhats(mensajeEnviar): #No subir esto a github porque me dexean
     '''
     account_sid = os.getenv('TWILIO_ACCOUNT_SID')
@@ -197,7 +182,6 @@ def enviarWhats(mensajeEnviar): #No subir esto a github porque me dexean
 
     print("Mensajes de whatsApp")
     print(mensajeEnviar)
-
 
 numCamaras = 3 #el numero de camaras/carpetas de imagenes
 pasos = 8 #numero de iteraciones de los agentes, se cambia al numero de fotos a analizar
