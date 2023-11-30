@@ -5,15 +5,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialize Roboflow model
-rf = Roboflow(api_key = os.getenv('ROBOFLOW_API_KEY'))
+rf = Roboflow(api_key=os.getenv('ROBOFLOW_API_KEY'))
 project = rf.workspace().project("tc2008")
 model = project.version(1).model
 
 # Directory containing images
 image_dir = "camera1Images"
-
-# Array to store JSON results
-predictions_camera_one = []
 
 # Iterate through each file in the directory
 for file in os.listdir(image_dir):
@@ -25,8 +22,12 @@ for file in os.listdir(image_dir):
         # Perform prediction and get JSON result
         json_output = model.predict(image_path, confidence=70, overlap=30).json()
 
-        # Append the result to the array
-        predictions_camera_one.append(json_output)
+        # Check if there is a 'full_truck' class in predictions
+        for prediction in json_output['predictions']:
+            if prediction['class'] == 'full_truck':
+                print(f"Full truck found in {file}: {prediction}")
+                break  # Exit the loop after finding 'full_truck'
 
-# Print or process the array of JSON results as needed
-print(predictions_camera_one)
+        # If a 'full_truck' class was found, exit the outer loop
+        if any(prediction['class'] == 'full_truck' for prediction in json_output['predictions']):
+            break
