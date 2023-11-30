@@ -19,15 +19,28 @@ project = rf.workspace().project("tc2008")
 model = project.version(1).model
 
 
-def camionDetectado(self): 
-  #Cambiar esta funcion a la API de Roboflow para detectar camiones, que regrese True si se detecta camión
-  numero_aleatorio_1 = random.random()
-  numero_aleatorio_2 = random.random()
+def camionDetectado(self, camera_id): 
+    # Mapping camera_id to directory names
+    camera_dirs = {1: "camera1Images", 2: "camera2Images", 3: "camera3Images"}
+    camera_dir = camera_dirs.get(camera_id)
+    print(f"Folder: {camera_dir}")
+    if camera_dir is None:
+        print(f"Invalid camera ID: {camera_id}")
+        return False
 
-  if numero_aleatorio_1 >= numero_aleatorio_2:
-    return True
-  else:
-     return False
+    # Check the specified directory for full_truck
+    for file in os.listdir(camera_dir):
+        if file.endswith(".png"):
+            image_path = os.path.join(camera_dir, file)
+            json_output = model.predict(image_path, confidence=70, overlap=30).json()
+
+            for prediction in json_output['predictions']:
+                if prediction['class'] == 'full_truck':
+                    print(f"Full truck found in {file} in directory {camera_dir}: {prediction}")
+                    return True  # Return True as soon as a full_truck is detected
+
+    return False  # Return False if no full_truck is detected
+
 
 class camara(ap.Agent): #Agente camara
   def setup(self):
@@ -39,7 +52,7 @@ class camara(ap.Agent): #Agente camara
     self.conteoTotal = 0 #Conteo total de camiones de todos los agentes/camaras
 
   def see(self): #Ver en el mapa (Imagen/Video) si hay un camión a la vista
-    if camionDetectado(self): #Enviar imagen a la funcion de camionDetected para que lo envie a roboflow
+    if camionDetectado(self, self.id): #Enviar imagen a la funcion de camionDetected para que lo envie a roboflow
       self.communicate("Camion detectado por camara ", self.id) #Hablar con el resto de las camaras y avisarles de su avistamiento
       self.brf() #Cambiar las beliefs del agente
 
@@ -51,7 +64,6 @@ class camara(ap.Agent): #Agente camara
     if self.detectCamion == True and self.intentions == True:
       self.filter()
       return True
-    
     else:
       return False
 
