@@ -19,7 +19,7 @@ project = rf.workspace().project("tc2008")
 model = project.version(1).model
 
 
-def camionDetectado(self, camera_id): 
+def camionDetectado(self, camera_id, current_step): 
     # Mapping camera_id to directory names
     camera_dirs = {1: "camera1Images", 2: "camera2Images", 3: "camera3Images"}
     camera_dir = camera_dirs.get(camera_id)
@@ -28,18 +28,18 @@ def camionDetectado(self, camera_id):
         print(f"Invalid camera ID: {camera_id}")
         return False
 
-    # Check the specified directory for full_truck
-    for file in os.listdir(camera_dir):
-        if file.endswith(".png"):
-            image_path = os.path.join(camera_dir, file)
-            json_output = model.predict(image_path, confidence=70, overlap=30).json()
+    image_file = f"{current_step}.png"
+    image_path = os.path.join(camera_dir, image_file)
 
-            for prediction in json_output['predictions']:
-                if prediction['class'] == 'full_truck':
-                    print(f"Full truck found in {file} in directory {camera_dir}: {prediction}")
-                    return True  # Return True as soon as a full_truck is detected
+    # Check if the file exists and process it
+    if os.path.isfile(image_path):
+        json_output = model.predict(image_path, confidence=70, overlap=30).json()
+        for prediction in json_output['predictions']:
+            if prediction['class'] == 'full_truck':
+                print(f"Full truck found in {image_file} in directory {camera_dir}: {prediction}")
+                return True  # Return True as soon as a full_truck is detected
 
-    return False  # Return False if no full_truck is detected
+    return False  # Return False if the file doesn't exist or no full_truck is detected
 
 
 class camara(ap.Agent): #Agente camara
@@ -51,8 +51,8 @@ class camara(ap.Agent): #Agente camara
     self.intentions = True #Intentions si quiere detectar camiones
     self.conteoTotal = 0 #Conteo total de camiones de todos los agentes/camaras
 
-  def see(self): #Ver en el mapa (Imagen/Video) si hay un camión a la vista
-    if camionDetectado(self, self.id): #Enviar imagen a la funcion de camionDetected para que lo envie a roboflow
+  def see(self, current_step): #Ver en el mapa (Imagen/Video) si hay un camión a la vista
+    if camionDetectado(self, self.id, current_step): #Enviar imagen a la funcion de camionDetected para que lo envie a roboflow
       self.communicate("Camion detectado por camara ", self.id) #Hablar con el resto de las camaras y avisarles de su avistamiento
       self.brf() #Cambiar las beliefs del agente
 
@@ -131,9 +131,12 @@ class simulacion(ap.Model):
     def setup(self):#Set up de los agentes dentro de la simulacion
         # Create agents list
         self.agents = ap.AgentList(self, self.p.numCamaras, camara)
+        self.current_step = 0  # Initialize step counter
 
     def step(self):#En cada paso los agentes miran si detectan un camión
-        self.agents.see()
+      self.current_step += 1  # Increment step counter
+      for agent in self.agents:
+        agent.see(self.current_step)  # Pass the current step to the see method
 
     def update(self): #Por cada update se ve el numero de camiones detectados por camara
         camionesContados = 0
