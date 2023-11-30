@@ -195,8 +195,8 @@ def enviarWhats(mensajeEnviar): #No subir esto a github porque me dexean
     print(mensajeEnviar)
 
 
-numCamaras = 4 #el numero de camaras/carpetas de imagenes
+numCamaras = 3 #el numero de camaras/carpetas de imagenes
 pasos = 8 #numero de iteraciones de los agentes, se cambia al numero de fotos a analizar
-numeroCamiones = 15 #Camiones que pagaron
+numeroCamiones = 2 #Camiones que pagaron
 
 simi(numCamaras, pasos, numeroCamiones)
