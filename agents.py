@@ -29,9 +29,7 @@ def camionDetectado(self):
   else:
      return False
 
-
 class camara(ap.Agent): #Agente camara
-
   def setup(self):
     #Beliefs del agente
     self.detectCamion = False # Desires, contar los camiones detactados
@@ -46,9 +44,7 @@ class camara(ap.Agent): #Agente camara
       self.brf() #Cambiar las beliefs del agente
 
   def brf(self): #si detecta un camion su belief de ver camion cambia a true y ve sus opciones
-    
     self.detectCamion = True
-    
     self.options()
 
   def options(self): #si detecta camion y tiene la intencion de detectar va a dar la opcion de true y seguir al filtro
@@ -64,7 +60,6 @@ class camara(ap.Agent): #Agente camara
       self.action()
       self.detectCamion = False
 
-
   def action(self): #Se cuenta el camion, se vota si reportarlo
     self.countTrucks = self.countTrucks + 1
     self.votacion()
@@ -72,7 +67,6 @@ class camara(ap.Agent): #Agente camara
     #enviarWhats(f"Se detecto robo por la camara {self.id}")
   
   def communicate(self, message, ids): #Comunicación entre agentes, el agente que detecte camión le avisa al resto de los agentes
-   
     for agente in self.model.agents:#Se envia mensaje a todos menos a si mismo
       if self != agente:
         agente.receive_message(message, ids)
@@ -167,19 +161,6 @@ def simi(numCam, pasos, total):#Prep para la simulación
     enviarWhats(f"Se robaron {resutadoFinal-total} camiones")
 
 def enviarWhats(mensajeEnviar): #No subir esto a github porque me dexean
-    '''
-    account_sid = os.getenv('TWILIO_ACCOUNT_SID')
-    auth_token = os.getenv('TWILIO_AUTH_TOKEN')
-    client = Client(account_sid, auth_token)
-
-    message = client.messages.create(
-    from_='whatsapp:+14155238886',
-    body=mensajeEnviar,
-    to= os.getenv('RECIPIENT_WHATSAPP_NUMBER_STEFANO')
-    )
-
-    print(message.sid)'''
-
     print("Mensajes de whatsApp")
     print(mensajeEnviar)
 
