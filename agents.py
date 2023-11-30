@@ -12,7 +12,11 @@ from dotenv import load_dotenv #Para variables de entorno
 from roboflow import Roboflow #Para la API de Roboflow
 import os
 
+# Initialize Roboflow model
 load_dotenv()
+rf = Roboflow(api_key=os.getenv('ROBOFLOW_API_KEY'))
+project = rf.workspace().project("tc2008")
+model = project.version(1).model
 
 
 def camionDetectado(self): 
