@@ -176,14 +176,14 @@ def simi(numCam, pasos, total):#Prep para la simulación
     enviarWhats(f"Se robaron {resutadoFinal-total} camiones")
 
 def enviarWhats(mensajeEnviar): #No subir esto a github porque me dexean
-    account_sid = 'AC7f1e0c3b454857c4c3937768d5eff2d3'
-    auth_token = 'e29cf6ac1f18445ad26ae35a0b39a225'
+    account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+    auth_token = os.getenv('TWILIO_AUTH_TOKEN')
     client = Client(account_sid, auth_token)
 
     message = client.messages.create(
     from_='whatsapp:+14155238886',
     body=mensajeEnviar,
-    to='whatsapp:+5214771811509'
+    to='os.getenv("PHONE_NUMBER")'
     )
 
     print(message.sid)
