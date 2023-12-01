@@ -176,11 +176,23 @@ def simi(numCam, pasos, total):#Prep para la simulación
     enviarWhats(f"Se robaron {resutadoFinal-total} camiones")
 
 def enviarWhats(mensajeEnviar): #No subir esto a github porque me dexean
+    account_sid = 'AC7f1e0c3b454857c4c3937768d5eff2d3'
+    auth_token = 'e29cf6ac1f18445ad26ae35a0b39a225'
+    client = Client(account_sid, auth_token)
+
+    message = client.messages.create(
+    from_='whatsapp:+14155238886',
+    body=mensajeEnviar,
+    to='whatsapp:+5214771811509'
+    )
+
+    print(message.sid)
+    
     print("Mensajes de whatsApp")
     print(mensajeEnviar)
 
 numCamaras = 3 #el numero de camaras/carpetas de imagenes
-pasos = 8 #numero de iteraciones de los agentes, se cambia al numero de fotos a analizar
-numeroCamiones = 2 #Camiones que pagaron
+pasos = 40 #numero de iteraciones de los agentes, se cambia al numero de fotos a analizar
+numeroCamiones = 4 #Camiones que pagaron
 
 simi(numCamaras, pasos, numeroCamiones)
